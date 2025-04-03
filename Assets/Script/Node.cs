@@ -57,19 +57,17 @@ public class Node : IHeapItem<Node>
         return -compare;
     }
 
-    public void SetStateEnemyOn(int enemyId)
+    public void SetStateEnemy()
     {
-        walkable = false;
-        haveEnemyOn = true;
-        havePlayerOn = true;
-        enemyIndex = enemyId;
+        this.walkable = false;
+        this.haveEnemyOn = true;
+        this.havePlayerOn = false;
     }
 
     public void SetStateNormalTile()
     {
-        walkable = true;
-        haveEnemyOn = false;
-        havePlayerOn = false;
-        enemyIndex = -1;
+        this.walkable = true;
+        this.haveEnemyOn = false;
+        this.havePlayerOn = false;
     }
 }

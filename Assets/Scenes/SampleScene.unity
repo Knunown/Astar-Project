@@ -507,7 +507,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 751907451278624124, guid: f63becef06b8cb5418b66b18c318042b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.61
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 751907451278624124, guid: f63becef06b8cb5418b66b18c318042b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -713,7 +713,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemy:
   - {fileID: 4689675622812431295, guid: ff176d6f83ce3ee4a8bcc3d2dac9d849, type: 3}
-  enemies: []
+  enemiesGO: []
   numberOfEnemies: 3
   gridManager: {fileID: 0}
 --- !u!4 &538469257
@@ -2192,6 +2192,7 @@ MonoBehaviour:
   spawner: {fileID: 0}
   enemy: {fileID: 0}
   enemies: []
+  enemiesScript: []
 --- !u!1 &1482957777
 GameObject:
   m_ObjectHideFlags: 0

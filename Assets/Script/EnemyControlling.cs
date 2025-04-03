@@ -1,7 +1,11 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class EnemyControlling : MonoBehaviour
 {
@@ -14,13 +18,31 @@ public class EnemyControlling : MonoBehaviour
     [SerializeField] private Enemy enemy;
 
     [SerializeField] private List<GameObject> enemies = new List<GameObject>();
+    [SerializeField] private List<Enemy> enemiesScript = new List<Enemy>();
+    [SerializeField] private CharacterControlling characterControlling;
+
     
     void Awake()
     {
         gridManager = GameObject.Find("Grid").GetComponent<GridManager>();
         player = PlayerStats.Instance;
-        spawner = GameObject.Find("EnemySpawner").GetComponent<Spawner>();
-        enemies = spawner.enemies;
+        spawner = Spawner.Instance;
+        enemies = spawner.GetEnemies();
+        characterControlling = gameObject.GetComponent<CharacterControlling>();
+        //enemiesNode = spawner.enemies;
+    }
+
+    private void Start()
+    {
+        enemiesScript = spawner.enemies;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCoroutine(EnemyRandomlyMoving());
+        }
     }
 
     public void BeDamaged(int enemyIndex, int dmg)
@@ -125,30 +147,63 @@ public class EnemyControlling : MonoBehaviour
     //    }
     //}
 
-    //public List<Node> EnemyFindPath()
-    //{
-    //    foreach(GameObject e in enemies)
-    //    {
-    //        enemy = e.GetComponent<Enemy>();
-    //        Node startPoint = gridManager.NodeFromWorldPoint(e.transform.position);
-    //        List<Node> movingPath = new List<Node>();
-    //        movingPath.Add(startPoint);
-    //        for(int i = 0; i < enemy.GetMovementRange() ; i++)
-    //        {
-    //            Node node = movingPath[i];
-    //            List<Node> neighbors = gridManager.GetNeighbours(node);
-    //            int random = Random.Range(1, neighbors.Count);
-    //            movingPath.Add(neighbors[random]);
-    //        }
-    //        movingPath.RemoveAt(0);
-    //        startPoint.SetStateNormalTile();
-    //        movingPath[movingPath.Count].SetStateEnemyOn(enemy.GetIndex());
 
 
+    private IEnumerator EnemyRandomlyMoving()
+    {
+        int stepCount = -1;
 
-    //        return movingPath;
-    //    }
-    //}
+        //--consider to remove--
+        Dictionary<Enemy, Node> path = new Dictionary<Enemy, Node>();
+
+        List<Node> unwalkableNodes = new List<Node>();
+        //----------------------
+
+        int numberOfEnemies = enemies.Count;
+
+
+        while (numberOfEnemies > 0)
+        {
+            stepCount++;
+
+            //--consider to remove--
+            unwalkableNodes.Clear();
+            //----------------------
+
+            foreach (Enemy e in enemiesScript)
+            {
+                int randomNode;
+                Node finishNode;
+                if (stepCount != e.GetMovementRange())
+                {
+                    List<Node> neighbors = gridManager.GetNeighbours(e.GetEnemyNode());
+                    gridManager.grid[e.GetEnemyNode().gridX,e.GetEnemyNode().gridY].SetStateNormalTile();
+
+                    neighbors = neighbors.FindAll(n => !unwalkableNodes.Contains(n) && n.walkable);
+
+                    randomNode = UnityEngine.Random.Range(1, neighbors.Count);
+                    finishNode = neighbors[randomNode];
+                    e.SetEnemyNode(finishNode);
+
+                    gridManager.grid[finishNode.gridX, finishNode.gridY] = e.GetEnemyNode();
+
+                    Vector3 nextStep = finishNode.worldPosition;
+                    
+                    //--consider to remove--
+                    unwalkableNodes.Add(finishNode);
+                    //----------------------
+
+                    e.gameObject.transform.position = nextStep;
+                    //characterControlling.StartCoroutine(Moving());
+                    yield return new WaitForSeconds(0.5f);
+                }
+                else
+                {
+                    numberOfEnemies--;
+                }
+            }
+        }
+    }
 
     
 }

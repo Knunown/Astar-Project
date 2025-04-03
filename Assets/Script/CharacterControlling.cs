@@ -28,6 +28,7 @@ public class CharacterControlling : MonoBehaviour
     [SerializeField] GridManager gridManager;
     List<Node> path;
     [SerializeField] EnemyControlling enemyControlling;
+    PlayerStats playerStats;
 
     SuggestTiles suggestTiles;
 
@@ -37,6 +38,7 @@ public class CharacterControlling : MonoBehaviour
         gridManager = GameObject.Find("Grid").GetComponent<GridManager>();
         enemyControlling = GetComponent<EnemyControlling>();
         suggestTiles = GameObject.Find("SuggestPathManager").GetComponent<SuggestTiles>();
+        playerStats = PlayerStats.Instance;
     }
 
     void Start()
@@ -44,7 +46,7 @@ public class CharacterControlling : MonoBehaviour
         player = GameObject.FindWithTag("Player");
         animator = GameObject.Find("MainCharacter").GetComponent<Animator>();
     }
-
+    
 
     void Update()
     {
@@ -90,6 +92,7 @@ public class CharacterControlling : MonoBehaviour
                         moveAction = true;
                         StartCoroutine(DoAction(index));
                         gridManager.NodeFromWorldPoint(playerPosition).havePlayerOn = false;
+                        
                         gridManager.NodeFromWorldPoint(playerPosition).walkable = true;
                         firstPointedNode.havePlayerOn = true;
                         firstPointedNode.walkable = false;
@@ -153,7 +156,6 @@ public class CharacterControlling : MonoBehaviour
             yield return StartCoroutine(Moving());
             Debug.Log("Player Moved");
             moveAction = false;
-
         }
 
         //Attack
@@ -174,8 +176,6 @@ public class CharacterControlling : MonoBehaviour
         }
         allowClick = true;
     }
-
-
 
 
 
@@ -207,7 +207,6 @@ public class CharacterControlling : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
             player.transform.position = n.worldPosition;
         }
-
         secondMove = false;
         pointedNode = null;
     }
@@ -222,7 +221,7 @@ public class CharacterControlling : MonoBehaviour
         }
         yield return new WaitForSeconds(0.1f);
         animator.SetBool("Attack", false);
-        int dmg = PlayerStats.Instance.GetDamage();
+        int dmg = playerStats.GetDamage();
         // Execute from EnemyControlling
         enemyControlling.BeDamaged(enemyIndex , dmg);
         attackAction = false;
@@ -232,6 +231,43 @@ public class CharacterControlling : MonoBehaviour
     public void HandleRotate()
     {
 
+    }
+
+
+
+
+
+
+    IEnumerator Moving2(List<Node> path)
+    {
+        foreach (Node n in path)
+        {
+            Vector3 directionToTarget = n.worldPosition - player.transform.position;
+            Vector3 objectForward = player.transform.forward;
+            float angle = Vector3.Angle(objectForward, directionToTarget);
+            Vector3 rotationAxis = Vector3.Cross(objectForward, directionToTarget);
+            if (rotationAxis == Vector3.zero)
+            {
+                rotationAxis = Vector3.Cross(player.transform.right, directionToTarget);
+            }
+            Quaternion angle2 = Quaternion.AngleAxis(angle, rotationAxis) * player.transform.rotation;
+
+            float timer = 0f;
+            Vector3 currentPosition = player.transform.position;
+            animator.SetBool("Moving", true);
+            while (timer < jumpDuration)
+            {
+                player.transform.rotation = Quaternion.RotateTowards(player.transform.rotation, angle2, angle / (jumpDuration / 2) * Time.deltaTime);
+                player.transform.position = Vector3.Lerp(currentPosition, n.worldPosition, timer / jumpDuration);
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            animator.SetBool("Moving", false);
+            yield return new WaitForSeconds(0.1f);
+            player.transform.position = n.worldPosition;
+        }
+        secondMove = false;
+        pointedNode = null;
     }
 }
 

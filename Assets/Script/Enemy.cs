@@ -24,11 +24,16 @@ public class Enemy : MonoBehaviour
         damage = enemyStats.GetDamage();
         movementRange = enemyStats.GetRange();
         player = PlayerStats.Instance;
+        node.SetStateEnemy();
     }
 
     public void BeDamaged(int dmg)
     {
         this.currentHealth = Mathf.Max(0 , currentHealth - dmg);
+        if(this.currentHealth==0)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void DoDamage(int dmg)
@@ -51,17 +56,23 @@ public class Enemy : MonoBehaviour
         return enemyStats.GetName() + this.enemyIndex;
     }
 
-    public Node GetCord()
+    public void SetGridNode(Node node)
     {
-        return gridManager.NodeFromWorldPoint(transform.position);
+        gridManager.grid[this.node.gridX,this.node.gridY] = node; 
+    }   
+
+    public Node GetEnemyNode()
+    {
+        return this.node;
     }
 
-    public void SetEnemyNode(Node n)
+
+    public void SetEnemyNode(Node node)
     {
-        n.haveEnemyOn = true;
-        n.walkable = false;
-        n.enemyIndex = this.enemyIndex;
+        this.node = node;
+        this.node.SetStateEnemy();
     }
+
 
     public int GetHealth()
     {
@@ -82,4 +93,6 @@ public class Enemy : MonoBehaviour
     {
         return movementRange;
     }
+
+    
 }

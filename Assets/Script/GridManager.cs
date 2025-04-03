@@ -5,6 +5,9 @@ using UnityEngine.UIElements;
 
 public class GridManager : MonoBehaviour
 {
+
+
+
     [SerializeField] private Spawner spawner;
     [SerializeField] private EnemyControlling enemyControlling;
 
@@ -19,7 +22,11 @@ public class GridManager : MonoBehaviour
     [SerializeField] private LayerMask unwalkableMask;
     [SerializeField] private Vector2 gridWorldSize;
     [SerializeField] private float nodeRadius = 0.5f;
+
+
+    //Very important define the hole game
     public Node[,] grid;
+    
 
     private float nodeDiameter;
     int gridSizeX, gridSizeY;
@@ -38,9 +45,9 @@ public class GridManager : MonoBehaviour
     {
         SpawnTilesOnPlane();
         SpawnPlayer();
-        SpawnEnemy();
         SpawnDoor();
         SpawnWall();
+        SpawnEnemy();
     }
 
 
@@ -103,22 +110,22 @@ public class GridManager : MonoBehaviour
     public List<Node> path;
 
 
-    //void OnDrawGizmos()
-    //{
-    //    Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
-    //    if (grid != null)
-    //    {
-    //        foreach (Node n in grid)
-    //        {
-    //            Gizmos.color = (n.walkable) ? Color.white : Color.red;
-    //            if (path != null)
-    //                if (path.Contains(n))
-    //                    Gizmos.color = Color.black;
-    //            Gizmos.DrawCube(n.worldPosition, new Vector3(1, .1f, 1) * (nodeDiameter - .1f));
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
+        if (grid != null)
+        {
+            foreach (Node n in grid)
+            {
+                Gizmos.color = (n.walkable) ? Color.white : Color.red;
+                if (path != null)
+                    if (path.Contains(n))
+                        Gizmos.color = Color.black;
+                Gizmos.DrawCube(n.worldPosition, new Vector3(1, .1f, 1) * (nodeDiameter - .1f));
 
-    //        }
-    //    }
-    //}
+            }
+        }
+    }
 
 
 
@@ -192,5 +199,11 @@ public class GridManager : MonoBehaviour
                 spawnedWall.transform.localScale = new Vector3(1, 1, 1);
             }
         }
+    }
+
+
+    public void SetGridNode(Node node)
+    {
+        grid[node.gridX, node.gridY] = node;
     }
 }

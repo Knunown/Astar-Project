@@ -2,7 +2,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class SuggestTiles : MonoBehaviour
@@ -15,12 +14,22 @@ public class SuggestTiles : MonoBehaviour
     
     public void SuggestMovePath(List<Node> nodes) 
     {
+        int i = 0;
         foreach (Node n in nodes)
         {
+            
             mesh = GameObject.Find(n.tileName).GetComponentInChildren<MeshRenderer>();
             Material[] mats = mesh.materials;
-            mats[1] = suggesTile;
+            if (i< nodes.Count-1)
+            {
+                mats[1] = suggesTile;
+            }
+            else
+            {
+                mats[1] = enemyTile;
+            }
             mesh.materials = mats;
+            i++;
         }
     }
 

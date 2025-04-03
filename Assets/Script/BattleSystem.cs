@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public enum BattleState { PLAYERTURN , ENEMYTURN , PLAYERCHOOSE , PLAYERATTACKING}
+public enum BattleState { PLAYERTURN , PlAYERSELECTED , ENEMYSELECTED , ATTACKINGBEHAVIOR , MOVINGBEHAVIOR , PLAYERATTACKING , PLAYERMOVING , ENEMYTURN , ENEMYATTACKING}
 public class BattleSystem : MonoBehaviour
 {
     private BattleState state;
